@@ -27,24 +27,21 @@ import {
 const MENU_ITEMS = [
   {
     id: "submit",
-    title: "Submit",
-    subtitle: "Submit Waste",
+    title: "Submit Waste",
     icon: FaRecycle,
     color: "from-emerald-400 via-teal-500 to-green-600",
     route: "/submitwaste",
   },
   {
     id: "rewards",
-    title: "Reward Vault",
-    subtitle: "Redeem Rewards",
+    title: "Redeem Rewards",
     icon: FaGift,
     color: "from-amber-400 via-orange-500 to-yellow-600",
     route: "/rewards",
   },
   {
     id: "report",
-    title: "Report Hub",
-    subtitle: "Report Violations",
+    title: "Report Forum",
     icon: FaExclamationTriangle,
     color: "from-red-400 via-rose-500 to-pink-600",
     route: "/forum",
@@ -52,7 +49,6 @@ const MENU_ITEMS = [
   {
     id: "leaderboard",
     title: "Leaderboard",
-    subtitle: "Community Leaderboard",
     icon: FaTrophy,
     color: "from-blue-400 via-indigo-500 to-purple-600",
     route: "/leaderboard",
@@ -60,14 +56,12 @@ const MENU_ITEMS = [
   {
     id: "transactions",
     title: "Transactions",
-    subtitle: "Transaction history",
     icon: FaFileAlt,
     color: "from-gray-400 via-slate-500 to-gray-600",
     route: "/transactions",
   },
 ];
 
-// Optional: Error Boundary to catch errors, you can wrap Dashboard export with this in app if desired
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -393,7 +387,6 @@ export default function Dashboard() {
                           aria-label="User name"
                         >
                           {userName || "User"}{" "}
-                          <span role="img" aria-label="waving hand" className="inline-block animate-wave">👋</span>
                         </span>
                       </>
                     )}
@@ -405,7 +398,6 @@ export default function Dashboard() {
                     )} select-none`}
                     aria-label={`User eco points: ${points || 0}`}
                   >
-                    <FaCoins className="text-amber-500 dark:text-yellow-400 text-lg" />
                     <span>
                       {loadingUser ? "Fetching points..." : `Eco Points: ${points || 0}`}
                     </span>
@@ -491,16 +483,6 @@ export default function Dashboard() {
                     >
                       {item.subtitle}
                     </p>
-                  </div>
-                  <div
-                    className={`w-full ${
-                      isDark ? "bg-gray-200/20" : "bg-gray-800/20"
-                    } rounded-full h-0.5 mt-2`}
-                  >
-                    <div
-                      className={`h-0.5 bg-gradient-to-r ${item.color} rounded-full transition-all duration-500 group-active:w-full`}
-                      style={{ width: "0%" }}
-                    />
                   </div>
                 </div>
               </div>

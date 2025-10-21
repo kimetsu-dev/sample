@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
-import { Trophy, Medal, Award, Crown, Loader2, AlertTriangle } from 'lucide-react';
+import { Trophy, Medal, Award, Crown, Loader2, AlertTriangle, X, User as UserIcon } from 'lucide-react';
 
 export default function Leaderboard() {
   const navigate = useNavigate();
@@ -11,6 +11,9 @@ export default function Leaderboard() {
   const [topUsers, setTopUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
 
   const ArrowLeft = () => (
     <svg className={`${isDark ? 'text-gray-300' : 'text-gray-700'} w-5 h-5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,6 +39,60 @@ export default function Leaderboard() {
 
     fetchTopUsers();
   }, []);
+
+  // Generate achievements based on points
+  const generateAchievements = (points) => {
+    const allAchievements = [
+      { name: "First Steps", icon: "🌱", description: "Earned your first 100 points", requiredPoints: 100, unlocked: points >= 100 },
+      { name: "Eco Advocate", icon: "🌿", description: "Reached 500 points milestone", requiredPoints: 500, unlocked: points >= 500 },
+      { name: "Eco Hero", icon: "🏆", description: "Achieved 1000 points!", requiredPoints: 1000, unlocked: points >= 1000 },
+      { name: "Green Champion", icon: "👑", description: "Outstanding 2000+ points", requiredPoints: 2000, unlocked: points >= 2000 },
+    ];
+    return allAchievements;
+  };
+
+  // Fetch user details when clicked
+  const handleUserClick = async (user, rank) => {
+    setModalLoading(true);
+    setShowModal(true);
+    
+    try {
+      const userDocRef = doc(db, 'users', user.id);
+      const userDoc = await getDoc(userDocRef);
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const achievements = generateAchievements(userData.totalPoints || 0);
+        
+        setSelectedUser({
+          ...user,
+          ...userData,
+          rank,
+          achievements,
+        });
+      } else {
+        setSelectedUser({
+          ...user,
+          rank,
+          achievements: generateAchievements(user.totalPoints || 0),
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching user details:", err);
+      setSelectedUser({
+        ...user,
+        rank,
+        achievements: generateAchievements(user.totalPoints || 0),
+      });
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setTimeout(() => setSelectedUser(null), 300);
+  };
 
   // Mobile rank badge colors
   const getMobileRankBadge = (rank) => {
@@ -91,10 +148,11 @@ export default function Leaderboard() {
     return (
       <li
         key={user.id}
-        className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${
+        onClick={() => handleUserClick(user, rank)}
+        className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 cursor-pointer hover:scale-102 active:scale-98 ${
           isDark
-            ? "bg-gray-800/50 border-gray-700/50"
-            : "bg-white/70 border-gray-200"
+            ? "bg-gray-800/50 border-gray-700/50 hover:bg-gray-800/70"
+            : "bg-white/70 border-gray-200 hover:bg-white/90 hover:shadow-md"
         }`}
         aria-label={`Rank ${rank}, ${user.username || user.email || 'Anonymous user'} with ${user.totalPoints || 0} points`}
       >
@@ -132,8 +190,9 @@ export default function Leaderboard() {
     return (
       <tr
         key={user.id}
-        className={`border-b transition-colors ${
-          isDark ? "border-gray-700 hover:bg-gray-800/30" : "border-gray-200 hover:bg-gray-50"
+        onClick={() => handleUserClick(user, rank)}
+        className={`border-b transition-colors cursor-pointer ${
+          isDark ? "border-gray-700 hover:bg-gray-800/50" : "border-gray-200 hover:bg-gray-50/80"
         } ${rank <= 3 ? 'bg-gradient-to-r from-transparent to-transparent' : ''}`}
       >
         <td className="px-6 py-4">
@@ -371,6 +430,235 @@ export default function Leaderboard() {
           </div>
         </div>
       </div>
+
+      {/* User Profile Modal */}
+      {showModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+          onClick={closeModal}
+        >
+          <div
+            className={`relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl animate-slideUp ${
+              isDark ? "bg-gray-800 text-gray-200" : "bg-white text-gray-900"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-all duration-300 hover:scale-110 ${
+                isDark
+                  ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+              }`}
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {modalLoading ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className={`animate-spin w-12 h-12 mb-4 ${isDark ? "text-green-400" : "text-green-600"}`} />
+                <p className={`text-base ${isDark ? "text-gray-400" : "text-gray-600"}`}>Loading profile...</p>
+              </div>
+            ) : selectedUser ? (
+              <>
+                {/* Header Section */}
+                <div className={`p-8 border-b ${isDark ? "border-gray-700" : "border-gray-200"}`}>
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    {/* Profile Picture */}
+                    <div className="relative">
+                      {selectedUser.profileUrl ? (
+                        <img
+                          src={selectedUser.profileUrl}
+                          alt="Profile"
+                          className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-xl"
+                        />
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center border-4 border-white shadow-xl">
+                          <UserIcon size={36} className="text-gray-600" />
+                        </div>
+                      )}
+                      {/* Rank Badge */}
+                      <div className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold shadow-lg ${
+                        selectedUser.rank === 1
+                          ? "bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900"
+                          : selectedUser.rank === 2
+                          ? "bg-gradient-to-r from-gray-300 to-gray-400 text-gray-900"
+                          : selectedUser.rank === 3
+                          ? "bg-gradient-to-r from-amber-600 to-amber-700 text-white"
+                          : isDark
+                          ? "bg-gray-700 text-gray-300"
+                          : "bg-gray-200 text-gray-700"
+                      }`}>
+                        #{selectedUser.rank}
+                      </div>
+                    </div>
+
+                    {/* User Info */}
+                    <div className="flex-1 text-center sm:text-left">
+                      <h2 className={`text-2xl font-bold mb-2 ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+                        {selectedUser.username || selectedUser.email || 'Anonymous'}
+                      </h2>
+                      <p className={`text-sm mb-3 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                        {selectedUser.email}
+                      </p>
+                      <div className="flex items-center justify-center sm:justify-start gap-4">
+                        <div className={`px-4 py-2 rounded-xl ${isDark ? "bg-gray-700" : "bg-emerald-50"}`}>
+                          <div className={`text-2xl font-bold ${isDark ? "text-emerald-400" : "text-emerald-700"}`}>
+                            {(selectedUser.totalPoints || 0).toLocaleString()}
+                          </div>
+                          <div className={`text-xs ${isDark ? "text-emerald-500" : "text-emerald-600"}`}>Points</div>
+                        </div>
+                        <div className={`px-4 py-2 rounded-xl ${isDark ? "bg-gray-700" : "bg-blue-50"}`}>
+                          <div className={`text-2xl font-bold ${isDark ? "text-blue-400" : "text-blue-700"}`}>
+                            #{selectedUser.rank}
+                          </div>
+                          <div className={`text-xs ${isDark ? "text-blue-500" : "text-blue-600"}`}>Rank</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Achievements Section */}
+                <div className="p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className={`text-xl font-bold flex items-center ${isDark ? "text-gray-200" : "text-gray-800"}`}>
+                      <Award className="mr-2 text-2xl" /> Achievements
+                    </h3>
+                    <span className={`text-sm ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                      {selectedUser.achievements?.filter(a => a.unlocked).length || 0} of {selectedUser.achievements?.length || 0} unlocked
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {selectedUser.achievements?.map((achievement, index) => (
+                      <div
+                        key={index}
+                        className={`rounded-xl p-4 border transition-all duration-300 relative ${
+                          achievement.unlocked
+                            ? `${
+                                isDark ? "bg-yellow-800/20 border-yellow-600/30" : "bg-yellow-50 border-amber-200"
+                              }`
+                            : `${
+                                isDark 
+                                  ? "bg-gray-700/30 border-gray-600/30 opacity-60" 
+                                  : "bg-gray-50 border-gray-200 opacity-70"
+                              }`
+                        }`}
+                      >
+                        {/* Unlocked indicator */}
+                        {achievement.unlocked && (
+                          <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1">
+                            <Award className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+
+                        <div className="flex items-start space-x-3">
+                          <div 
+                            className={`text-3xl flex-shrink-0 ${
+                              achievement.unlocked ? "" : "grayscale opacity-40"
+                            }`}
+                          >
+                            {achievement.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 
+                              className={`font-bold text-base mb-1 ${
+                                achievement.unlocked 
+                                  ? (isDark ? "text-yellow-300" : "text-amber-800")
+                                  : (isDark ? "text-gray-400" : "text-gray-600")
+                              }`}
+                            >
+                              {achievement.name}
+                            </h4>
+                            <p 
+                              className={`text-xs ${
+                                achievement.unlocked 
+                                  ? (isDark ? "text-yellow-400" : "text-amber-600")
+                                  : (isDark ? "text-gray-500" : "text-gray-500")
+                              }`}
+                            >
+                              {achievement.description}
+                            </p>
+
+                            {/* Progress for locked achievements */}
+                            {!achievement.unlocked && (
+                              <div className="mt-2">
+                                <div className={`w-full rounded-full h-1 ${isDark ? "bg-gray-600" : "bg-gray-200"}`}>
+                                  <div
+                                    className="bg-gradient-to-r from-blue-400 to-blue-500 h-1 rounded-full transition-all duration-500"
+                                    style={{ 
+                                      width: `${Math.min(((selectedUser.totalPoints || 0) / achievement.requiredPoints) * 100, 100)}%` 
+                                    }}
+                                  ></div>
+                                </div>
+                                <p className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+                                  {achievement.requiredPoints - (selectedUser.totalPoints || 0)} points to unlock
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Motivational Message */}
+                  <div className={`mt-6 p-4 rounded-xl ${isDark ? "bg-blue-900/20 border border-blue-700/30" : "bg-blue-50 border border-blue-200"}`}>
+                    <p className={`text-center text-sm ${isDark ? "text-blue-300" : "text-blue-800"}`}>
+                      {selectedUser.achievements?.filter(a => a.unlocked).length === selectedUser.achievements?.length
+                        ? "🎉 All achievements unlocked! You're an eco champion!"
+                        : selectedUser.achievements?.filter(a => a.unlocked).length > 0
+                        ? "Keep going! More achievements await!"
+                        : "Start your eco journey to unlock achievements!"}
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {/* Custom CSS for animations */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+        
+        .animate-slideUp {
+          animation: slideUp 0.3s ease-out;
+        }
+
+        .hover\\:scale-102:hover {
+          transform: scale(1.02);
+        }
+
+        .active\\:scale-98:active {
+          transform: scale(0.98);
+        }
+      `}</style>
     </div>
   );
 }

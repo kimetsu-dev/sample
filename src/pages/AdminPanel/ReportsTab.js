@@ -121,6 +121,10 @@ export default function ReportsTab({ reports, setReports, formatTimestamp, getSt
 
   // Category management functions
   const addCategory = () => {
+    if (!newCategory.id || !newCategory.label) {
+      showToast("Please fill in all category fields", "error");
+      return;
+    }
     
     if (categories.find(cat => cat.id === newCategory.id)) {
       showToast("Category ID already exists", "error");
@@ -619,24 +623,24 @@ export default function ReportsTab({ reports, setReports, formatTimestamp, getSt
                     <button
                       onClick={() => updateReportStatus(report.id, "in review")}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        report.status === "in review"
-                          ? (isDark ? "bg-blue-700 text-blue-300 cursor-default" : "bg-blue-300 text-blue-700 cursor-default")
+                        report.status === "in review" || report.status === "resolved"
+                          ? (isDark ? "bg-gray-700 text-gray-500 cursor-not-allowed" : "bg-gray-300 text-gray-500 cursor-not-allowed")
                           : (isDark ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-blue-500 text-white hover:bg-blue-600")
                       }`}
-                      disabled={report.status === "in review"}
+                      disabled={report.status === "in review" || report.status === "resolved"}
                     >
-                      Mark In Review
+                      {report.status === "in review" ? "In Review" : report.status === "resolved" ? "Already Resolved" : "Mark In Review"}
                     </button>
                     <button
                       onClick={() => updateReportStatus(report.id, "resolved")}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         report.status === "resolved"
-                          ? (isDark ? "bg-emerald-700 text-emerald-300 cursor-default" : "bg-emerald-300 text-emerald-700 cursor-default")
+                          ? (isDark ? "bg-gray-700 text-gray-500 cursor-not-allowed" : "bg-gray-300 text-gray-500 cursor-not-allowed")
                           : (isDark ? "bg-emerald-600 text-white hover:bg-emerald-700" : "bg-emerald-500 text-white hover:bg-emerald-600")
                       }`}
                       disabled={report.status === "resolved"}
                     >
-                      Mark Resolved
+                      {report.status === "resolved" ? "Resolved" : "Mark Resolved"}
                     </button>
                   </div>
                 </article>

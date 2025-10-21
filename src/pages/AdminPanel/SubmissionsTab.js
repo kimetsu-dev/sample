@@ -296,13 +296,15 @@ const SubmissionsTab = ({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
+      <div className={`sticky top-0 z-10 ${isDark ? 'bg-gray-900/95 border-gray-700' : 'bg-white/95 border-slate-200'} backdrop-blur-md border-b`}>
+      <div className="px-4 py-2">
+        <div className="flex items-center gap-2 mb-1">
           <h2 className={`text-2xl font-bold ${isDark ? "text-gray-100" : "text-slate-800"}`}>
             Submission Management
           </h2>
         </div>
       </div>
+    </div>
 
       {/* Live Stats Dashboard */}
       <div>

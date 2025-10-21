@@ -481,52 +481,243 @@ export default function AdminPanel() {
               }`}
             >
               <div className="p-6">
-              {/* Dashboard Tab */}
+             {/* Dashboard Tab */}
                 {activeTab === "dashboard" && (
                   <div className="space-y-6">
                     <div>
                       <h2 className={`text-2xl font-bold mb-2 ${isDark ? "text-gray-100" : "text-slate-800"}`}>
                         Dashboard Overview
                       </h2>
-                      <p className={`${isDark ? "text-gray-400" : "text-slate-600"}`}>
-                    
-                      </p>
+                      
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      {pendingSubmissions.length > 0 && (
+                    {/* Action Required Cards */}
+                    <div>
+                      <h3 className={`text-lg font-semibold mb-3 ${isDark ? "text-gray-200" : "text-slate-700"}`}>
+                        Requires Attention
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <button
                           onClick={() => setActiveTab("submissions")}
-                          className="p-4 bg-orange-50 border border-orange-200 rounded-lg text-left hover:bg-orange-100 transition-colors"
+                          className={`p-5 rounded-xl text-left transition-all transform hover:scale-105 ${
+                            pendingSubmissions.length > 0
+                              ? "bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-300 shadow-lg hover:shadow-xl"
+                              : isDark
+                              ? "bg-gray-700/50 border border-gray-600"
+                              : "bg-gray-50 border border-gray-200"
+                          }`}
                         >
-                          <div className="text-orange-600 font-semibold text-lg">{pendingSubmissions.length}</div>
-                          <div className="text-sm text-orange-700">Pending Submissions</div>
+                          <div className="flex items-center justify-between mb-2">
+                            <FiFileText className={`w-6 h-6 ${pendingSubmissions.length > 0 ? "text-orange-600" : isDark ? "text-gray-400" : "text-gray-400"}`} />
+                            {pendingSubmissions.length > 0 && (
+                              <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-full">
+                                ACTION
+                              </span>
+                            )}
+                          </div>
+                          <div className={`text-3xl font-bold mb-1 ${pendingSubmissions.length > 0 ? "text-orange-600" : isDark ? "text-gray-400" : "text-gray-400"}`}>
+                            {pendingSubmissions.length}
+                          </div>
+                          <div className={`text-sm font-medium ${pendingSubmissions.length > 0 ? "text-orange-700" : isDark ? "text-gray-500" : "text-gray-500"}`}>
+                            Pending Submissions
+                          </div>
                         </button>
-                      )}
 
-                      {redemptions.filter((r) => r.status === "pending").length > 0 && (
                         <button
                           onClick={() => setActiveTab("redemptions")}
-                          className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-left hover:bg-blue-100 transition-colors"
+                          className={`p-5 rounded-xl text-left transition-all transform hover:scale-105 ${
+                            redemptions.filter((r) => r.status === "pending").length > 0
+                              ? "bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300 shadow-lg hover:shadow-xl"
+                              : isDark
+                              ? "bg-gray-700/50 border border-gray-600"
+                              : "bg-gray-50 border border-gray-200"
+                          }`}
                         >
-                          <div className="text-blue-600 font-semibold text-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <FiTag className={`w-6 h-6 ${redemptions.filter((r) => r.status === "pending").length > 0 ? "text-blue-600" : isDark ? "text-gray-400" : "text-gray-400"}`} />
+                            {redemptions.filter((r) => r.status === "pending").length > 0 && (
+                              <span className="px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
+                                ACTION
+                              </span>
+                            )}
+                          </div>
+                          <div className={`text-3xl font-bold mb-1 ${redemptions.filter((r) => r.status === "pending").length > 0 ? "text-blue-600" : isDark ? "text-gray-400" : "text-gray-400"}`}>
                             {redemptions.filter((r) => r.status === "pending").length}
                           </div>
-                          <div className="text-sm text-blue-700">Pending Redemptions</div>
+                          <div className={`text-sm font-medium ${redemptions.filter((r) => r.status === "pending").length > 0 ? "text-blue-700" : isDark ? "text-gray-500" : "text-gray-500"}`}>
+                            Pending Redemptions
+                          </div>
                         </button>
-                      )}
 
-                      {reportsPendingCount > 0 && (
                         <button
                           onClick={() => setActiveTab("reports")}
-                          className="p-4 bg-red-50 border border-red-200 rounded-lg text-left hover:bg-red-100 transition-colors"
+                          className={`p-5 rounded-xl text-left transition-all transform hover:scale-105 ${
+                            reportsPendingCount > 0
+                              ? "bg-gradient-to-br from-red-50 to-rose-50 border-2 border-red-300 shadow-lg hover:shadow-xl"
+                              : isDark
+                              ? "bg-gray-700/50 border border-gray-600"
+                              : "bg-gray-50 border border-gray-200"
+                          }`}
                         >
-                          <div className="text-red-600 font-semibold text-lg">{reportsPendingCount}</div>
-                          <div className="text-sm text-red-700">Pending Reports</div>
+                          <div className="flex items-center justify-between mb-2">
+                            <FiAlertTriangle className={`w-6 h-6 ${reportsPendingCount > 0 ? "text-red-600" : isDark ? "text-gray-400" : "text-gray-400"}`} />
+                            {reportsPendingCount > 0 && (
+                              <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
+                                ACTION
+                              </span>
+                            )}
+                          </div>
+                          <div className={`text-3xl font-bold mb-1 ${reportsPendingCount > 0 ? "text-red-600" : isDark ? "text-gray-400" : "text-gray-400"}`}>
+                            {reportsPendingCount}
+                          </div>
+                          <div className={`text-sm font-medium ${reportsPendingCount > 0 ? "text-red-700" : isDark ? "text-gray-500" : "text-gray-500"}`}>
+                            Pending Reports
+                          </div>
                         </button>
-                      )}
+                      </div>
+                    </div>
 
-                     
+                    {/* System Overview */}
+                    <div>
+                      <h3 className={`text-lg font-semibold mb-3 ${isDark ? "text-gray-200" : "text-slate-700"}`}>
+                        System Overview
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className={`p-5 rounded-xl ${isDark ? "bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200"} shadow-sm`}>
+                          <FiUsers className={`w-6 h-6 mb-3 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
+                          <div className={`text-3xl font-bold mb-1 ${isDark ? "text-gray-100" : "text-slate-800"}`}>
+                            {users.length}
+                          </div>
+                          <div className={`text-sm ${isDark ? "text-gray-400" : "text-slate-600"}`}>
+                            Total Users
+                          </div>
+                        </div>
+
+                        <div className={`p-5 rounded-xl ${isDark ? "bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200"} shadow-sm`}>
+                          <FiGift className={`w-6 h-6 mb-3 ${isDark ? "text-purple-400" : "text-purple-600"}`} />
+                          <div className={`text-3xl font-bold mb-1 ${isDark ? "text-gray-100" : "text-slate-800"}`}>
+                            {rewards.length}
+                          </div>
+                          <div className={`text-sm ${isDark ? "text-gray-400" : "text-slate-600"}`}>
+                            Total Rewards
+                          </div>
+                        </div>
+
+                        <div className={`p-5 rounded-xl ${isDark ? "bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200"} shadow-sm`}>
+                          <FiCreditCard className={`w-6 h-6 mb-3 ${isDark ? "text-emerald-400" : "text-emerald-600"}`} />
+                          <div className={`text-3xl font-bold mb-1 ${isDark ? "text-gray-100" : "text-slate-800"}`}>
+                            {transactions.length}
+                          </div>
+                          <div className={`text-sm ${isDark ? "text-gray-400" : "text-slate-600"}`}>
+                            Transactions
+                          </div>
+                        </div>
+
+                        <div className={`p-5 rounded-xl ${isDark ? "bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600" : "bg-gradient-to-br from-white to-gray-50 border border-gray-200"} shadow-sm`}>
+                          <FiTag className={`w-6 h-6 mb-3 ${isDark ? "text-amber-400" : "text-amber-600"}`} />
+                          <div className={`text-3xl font-bold mb-1 ${isDark ? "text-gray-100" : "text-slate-800"}`}>
+                            {redemptions.length}
+                          </div>
+                          <div className={`text-sm ${isDark ? "text-gray-400" : "text-slate-600"}`}>
+                            Total Redemptions
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Inventory Status */}
+                    <div>
+                      <h3 className={`text-lg font-semibold mb-3 ${isDark ? "text-gray-200" : "text-slate-700"}`}>
+                        Inventory Status
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className={`p-5 rounded-xl ${isDark ? "bg-gradient-to-br from-emerald-900/30 to-emerald-800/30 border border-emerald-700/50" : "bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200"}`}>
+                          <div className={`text-2xl font-bold mb-1 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>
+                            {rewards.filter(r => r.stock > 5).length}
+                          </div>
+                          <div className={`text-sm ${isDark ? "text-emerald-300" : "text-emerald-700"}`}>
+                            In Stock (6+)
+                          </div>
+                        </div>
+
+                        <div className={`p-5 rounded-xl ${isDark ? "bg-gradient-to-br from-amber-900/30 to-amber-800/30 border border-amber-700/50" : "bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200"}`}>
+                          <div className={`text-2xl font-bold mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>
+                            {rewards.filter(r => r.stock > 0 && r.stock <= 5).length}
+                          </div>
+                          <div className={`text-sm ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                            Low Stock (1-5)
+                          </div>
+                        </div>
+
+                        <div className={`p-5 rounded-xl ${isDark ? "bg-gradient-to-br from-red-900/30 to-red-800/30 border border-red-700/50" : "bg-gradient-to-br from-red-50 to-rose-50 border border-red-200"}`}>
+                          <div className={`text-2xl font-bold mb-1 ${isDark ? "text-red-400" : "text-red-600"}`}>
+                            {rewards.filter(r => r.stock === 0).length}
+                          </div>
+                          <div className={`text-sm ${isDark ? "text-red-300" : "text-red-700"}`}>
+                            Out of Stock
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                   
+                    {/* Recent Activity */}
+                    <div>
+                      <h3 className={`text-lg font-semibold mb-3 ${isDark ? "text-gray-200" : "text-slate-700"}`}>
+                        Recent Activity
+                      </h3>
+                      <div className={`rounded-xl overflow-hidden ${isDark ? "bg-gray-700/50 border border-gray-600" : "bg-white border border-gray-200"}`}>
+                        {transactions.slice(0, 5).map((tx, idx) => {
+                          const user = users.find(u => u.id === tx.userId);
+                          return (
+                            <div 
+                              key={tx.id} 
+                              className={`p-4 flex items-center justify-between ${
+                                idx !== 0 ? (isDark ? "border-t border-gray-600" : "border-t border-gray-100") : ""
+                              }`}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                  tx.type === "earn" 
+                                    ? "bg-emerald-100 text-emerald-600" 
+                                    : tx.type === "redeem" 
+                                    ? "bg-purple-100 text-purple-600"
+                                    : "bg-blue-100 text-blue-600"
+                                }`}>
+                                  {tx.type === "earn" ? "+" : tx.type === "redeem" ? "🎁" : "•"}
+                                </div>
+                                <div>
+                                  <div className={`font-medium ${isDark ? "text-gray-200" : "text-slate-800"}`}>
+                                    {user?.displayName || "Unknown User"}
+                                  </div>
+                                  <div className={`text-sm ${isDark ? "text-gray-400" : "text-slate-500"}`}>
+                                    {tx.reason || tx.type}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className={`text-right`}>
+                                <div className={`font-bold ${
+                                  tx.type === "earn" 
+                                    ? "text-emerald-600" 
+                                    : tx.type === "redeem" 
+                                    ? "text-purple-600"
+                                    : "text-blue-600"
+                                }`}>
+                                  {tx.type === "earn" ? "+" : tx.type === "redeem" ? "-" : ""}{tx.amount} pts
+                                </div>
+                                <div className={`text-xs ${isDark ? "text-gray-400" : "text-slate-500"}`}>
+                                  {formatTimestamp(tx.timestamp)}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        {transactions.length === 0 && (
+                          <div className={`p-8 text-center ${isDark ? "text-gray-400" : "text-slate-500"}`}>
+                            No recent transactions
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}

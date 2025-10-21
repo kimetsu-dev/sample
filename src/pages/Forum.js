@@ -21,6 +21,7 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
+import { ThumbsUp } from "lucide-react";
 
 // SVG Icon Components
 const MapPinIcon = (props) => (
@@ -33,12 +34,6 @@ const MapPinIcon = (props) => (
 const ClockIcon = (props) => (
   <svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
-
-const ThumbsUpIcon = ({ filled = false, ...props }) => (
-  <svg {...props} fill={filled ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L9 7v13m-3-4l-2 2m5-6h7" />
   </svg>
 );
 
@@ -708,7 +703,7 @@ function ReportItem({ report, currentUser, commentText, setCommentText, commentS
                 : "hover:bg-gray-100 text-slate-600"
             }`}
           >
-            <ThumbsUpIcon filled={isLiked} className="h-4 w-4" />
+            <ThumbsUp className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
             <span className="font-medium">{likeCount}</span>
             <span className="hidden sm:inline">Like{likeCount !== 1 ? "s" : ""}</span>
           </button>

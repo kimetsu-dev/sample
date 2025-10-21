@@ -107,16 +107,13 @@ export default function Profile() {
   }, [navigate]);
 
   const generateAchievements = (points) => {
-    const achievements = [];
-    if (points >= 100)
-      achievements.push({ name: "First Steps", icon: "🌱", description: "Earned your first 100 points" });
-    if (points >= 500)
-      achievements.push({ name: "Eco Advocate", icon: "🌿", description: "Reached 500 points milestone" });
-    if (points >= 1000)
-      achievements.push({ name: "Eco Hero", icon: "🏆", description: "Achieved 1000 points!" });
-    if (points >= 2000)
-      achievements.push({ name: "Green Champion", icon: "👑", description: "Outstanding 2000+ points" });
-    return achievements;
+    const allAchievements = [
+      { name: "First Steps", icon: "🌱", description: "Earned your first 100 points", requiredPoints: 100, unlocked: points >= 100 },
+      { name: "Eco Advocate", icon: "🌿", description: "Reached 500 points milestone", requiredPoints: 500, unlocked: points >= 500 },
+      { name: "Eco Hero", icon: "🏆", description: "Achieved 1000 points!", requiredPoints: 1000, unlocked: points >= 1000 },
+      { name: "Green Champion", icon: "👑", description: "Outstanding 2000+ points", requiredPoints: 2000, unlocked: points >= 2000 },
+    ];
+    return allAchievements;
   };
 
   const validatePassword = (pwd) => {
@@ -707,47 +704,100 @@ export default function Profile() {
                 : "bg-white/95 border-gray-200/50 backdrop-blur-sm"
             }`}
           >
-            <h3 className={`text-xl sm:text-2xl font-bold mb-6 flex items-center ${isDark ? "text-gray-200" : "text-gray-800"}`}>
+            <h3 className={`text-xl sm:text-2xl font-bold mb-2 flex items-center ${isDark ? "text-gray-200" : "text-gray-800"}`}>
               <FiAward className="mr-3 text-2xl" /> Achievements
             </h3>
+            <p className={`text-sm mb-6 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+              {achievements.filter(a => a.unlocked).length} of {achievements.length} unlocked
+            </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {achievements.length > 0 ? (
-                achievements.map((achievement, index) => (
-                  <div
-                    key={index}
-                    className={`rounded-2xl p-5 border transition-all duration-300 hover:scale-105 hover:shadow-lg ${
-                      isDark ? "bg-yellow-800/20 border-yellow-600/30" : "bg-yellow-50 border-amber-200"
-                    }`}
-                    style={{
-                      animationDelay: `${index * 0.1}s`,
-                      animation: 'fadeInUp 0.6s ease-out forwards',
-                    }}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="text-3xl flex-shrink-0 animate-pulse">{achievement.icon}</div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className={`font-bold text-lg ${isDark ? "text-yellow-300" : "text-amber-800"}`}>
-                          {achievement.name}
-                        </h4>
-                        <p className={`text-sm ${isDark ? "text-yellow-400" : "text-amber-600"}`}>
-                          {achievement.description}
-                        </p>
-                      </div>
+              {achievements.map((achievement, index) => (
+                <div
+                  key={index}
+                  className={`rounded-2xl p-5 border transition-all duration-300 hover:scale-105 relative overflow-hidden ${
+                    achievement.unlocked
+                      ? `hover:shadow-lg ${
+                          isDark ? "bg-yellow-800/20 border-yellow-600/30" : "bg-yellow-50 border-amber-200"
+                        }`
+                      : `${
+                          isDark 
+                            ? "bg-gray-700/30 border-gray-600/30 opacity-60" 
+                            : "bg-gray-50 border-gray-200 opacity-70"
+                        }`
+                  }`}
+                  style={{
+                    animationDelay: `${index * 0.1}s`,
+                    animation: 'fadeInUp 0.6s ease-out forwards',
+                  }}
+                >
+                  {/* Unlocked Badge */}
+                  {achievement.unlocked && (
+                    <div className="absolute top-3 right-3 bg-green-500 rounded-full p-1 shadow-lg">
+                      <FiCheck className="text-white text-xs" />
+                    </div>
+                  )}
+
+                  {/* Locked Overlay */}
+                  {!achievement.unlocked && (
+                    <div className="absolute top-3 right-3">
+                      <FiLock className={`text-xl ${isDark ? "text-gray-500" : "text-gray-400"}`} />
+                    </div>
+                  )}
+
+                  <div className="flex items-center space-x-4">
+                    <div 
+                      className={`text-3xl flex-shrink-0 ${
+                        achievement.unlocked ? "animate-pulse" : "grayscale opacity-40"
+                      }`}
+                    >
+                      {achievement.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 
+                        className={`font-bold text-lg ${
+                          achievement.unlocked 
+                            ? (isDark ? "text-yellow-300" : "text-amber-800")
+                            : (isDark ? "text-gray-400" : "text-gray-600")
+                        }`}
+                      >
+                        {achievement.name}
+                      </h4>
+                      <p 
+                        className={`text-sm ${
+                          achievement.unlocked 
+                            ? (isDark ? "text-yellow-400" : "text-amber-600")
+                            : (isDark ? "text-gray-500" : "text-gray-500")
+                        }`}
+                      >
+                        {achievement.description}
+                      </p>
+                      
+                      {/* Progress indicator for locked achievements */}
+                      {!achievement.unlocked && (
+                        <div className="mt-3">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className={isDark ? "text-gray-500" : "text-gray-500"}>
+                              {points} / {achievement.requiredPoints} points
+                            </span>
+                            <span className={isDark ? "text-gray-500" : "text-gray-500"}>
+                              {Math.round((points / achievement.requiredPoints) * 100)}%
+                            </span>
+                          </div>
+                          <div className={`w-full rounded-full h-1.5 ${isDark ? "bg-gray-600" : "bg-gray-200"}`}>
+                            <div
+                              className="bg-gradient-to-r from-blue-400 to-blue-500 h-1.5 rounded-full transition-all duration-1000"
+                              style={{ width: `${Math.min((points / achievement.requiredPoints) * 100, 100)}%` }}
+                            ></div>
+                          </div>
+                          <p className={`text-xs mt-1 ${isDark ? "text-gray-500" : "text-gray-500"}`}>
+                            {achievement.requiredPoints - points} points to unlock
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className={`text-center py-12 col-span-full ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-                  <div className="relative">
-                    <FiTrendingUp className="mx-auto text-6xl mb-4 opacity-30 animate-pulse" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 border-4 border-dashed border-gray-300 rounded-full animate-spin opacity-20"></div>
-                    </div>
-                  </div>
-                  <p className="text-lg font-medium mb-2">No Achievements Yet</p>
-                  <p className="text-sm">Start earning points to unlock your first achievement!</p>
                 </div>
-              )}
+              ))}
             </div>
           </div>
 

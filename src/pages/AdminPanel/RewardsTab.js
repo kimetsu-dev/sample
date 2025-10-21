@@ -11,8 +11,6 @@ import {
   Tag,
   Package,
   Filter,
-  ChevronDown,
-  Star,
   TrendingUp,
   AlertTriangle,
   CheckCircle
@@ -30,56 +28,6 @@ export default function RewardsTab({
       imageUrl: null,
       popularity: 85
     },
-    {
-      id: 2,
-      name: "Wireless Headphones",
-      description: "Bluetooth wireless headphones with noise cancellation and premium sound quality.",
-      cost: 500,
-      stock: 3,
-      category: "electronics",
-      imageUrl: null,
-      popularity: 92
-    },
-    {
-      id: 3,
-      name: "Gift Card $50",
-      description: "Flexible gift card that can be used at various partner stores and online retailers.",
-      cost: 400,
-      stock: 0,
-      category: "gift cards",
-      imageUrl: null,
-      popularity: 78
-    },
-    {
-      id: 4,
-      name: "Team Lunch Voucher",
-      description: "Enjoy a complimentary team lunch at one of our partner restaurants.",
-      cost: 200,
-      stock: 15,
-      category: "experiences",
-      imageUrl: null,
-      popularity: 88
-    },
-    {
-      id: 5,
-      name: "Bluetooth Speaker",
-      description: "Portable wireless speaker with excellent sound quality and long battery life.",
-      cost: 300,
-      stock: 2,
-      category: "electronics",
-      imageUrl: null,
-      popularity: 91
-    },
-    {
-      id: 6,
-      name: "Company T-Shirt",
-      description: "Comfortable cotton t-shirt with company branding in various sizes.",
-      cost: 75,
-      stock: 0,
-      category: "merchandise",
-      imageUrl: null,
-      popularity: 65
-    }
   ],
   searchTerm = "",
   setSearchTerm = () => {},
@@ -99,7 +47,6 @@ export default function RewardsTab({
   const [showFilters, setShowFilters] = useState(false);
   const scrollRef = useRef(null);
 
-  // Use provided rewards or fallback to demo data
   const activeRewards = rewards.length > 0 ? rewards : [
     {
       id: 1,
@@ -111,66 +58,13 @@ export default function RewardsTab({
       imageUrl: null,
       popularity: 85
     },
-    {
-      id: 2,
-      name: "Wireless Headphones",
-      description: "Bluetooth wireless headphones with noise cancellation and premium sound quality.",
-      cost: 500,
-      stock: 3,
-      category: "electronics",
-      imageUrl: null,
-      popularity: 92
-    },
-    {
-      id: 3,
-      name: "Gift Card $50",
-      description: "Flexible gift card that can be used at various partner stores and online retailers.",
-      cost: 400,
-      stock: 0,
-      category: "gift cards",
-      imageUrl: null,
-      popularity: 78
-    },
-    {
-      id: 4,
-      name: "Team Lunch Voucher",
-      description: "Enjoy a complimentary team lunch at one of our partner restaurants.",
-      cost: 200,
-      stock: 15,
-      category: "experiences",
-      imageUrl: null,
-      popularity: 88
-    },
-    {
-      id: 5,
-      name: "Bluetooth Speaker",
-      description: "Portable wireless speaker with excellent sound quality and long battery life.",
-      cost: 300,
-      stock: 2,
-      category: "electronics",
-      imageUrl: null,
-      popularity: 91
-    },
-    {
-      id: 6,
-      name: "Company T-Shirt",
-      description: "Comfortable cotton t-shirt with company branding in various sizes.",
-      cost: 75,
-      stock: 0,
-      category: "merchandise",
-      imageUrl: null,
-      popularity: 65
-    }
   ];
 
-  // Collect unique categories from rewards for filter dropdown
   const categories = [...new Set(activeRewards.map((r) => r.category))];
 
-  // Filter rewards based on search term, category, and stock
   const filteredRewards = useMemo(() => {
     let filtered = activeRewards;
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(reward =>
         reward.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -178,12 +72,10 @@ export default function RewardsTab({
       );
     }
 
-    // Filter by category
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(reward => reward.category === categoryFilter);
     }
 
-    // Filter by stock status
     if (stockFilter !== 'all') {
       filtered = filtered.filter(reward => {
         if (stockFilter === 'in-stock') return reward.stock > 5;
@@ -195,13 +87,6 @@ export default function RewardsTab({
 
     return filtered;
   }, [activeRewards, searchTerm, categoryFilter, stockFilter]);
-
-  // Get stock status
-  const getStockStatus = (stock) => {
-    if (stock === 0) return 'out-of-stock';
-    if (stock <= 5) return 'low-stock';
-    return 'in-stock';
-  };
 
   const getStockColor = (stock) => {
     if (stock === 0) return isDark ? 'text-red-400 bg-red-900/30' : 'text-red-700 bg-red-50';
@@ -215,7 +100,6 @@ export default function RewardsTab({
     return <CheckCircle size={14} />;
   };
 
-  // Component for fallback icon with confetti animation when no image is present
   function RewardFallbackIcon({ rewardId }) {
     const { reward, rewardMe } = useReward(rewardId, "confetti", {
       lifetime: 1500,
@@ -246,47 +130,55 @@ export default function RewardsTab({
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Sticky Header */}
-      <div className={`sticky top-0 z-10 ${isDark ? 'bg-gray-900/95' : 'bg-white/95'} backdrop-blur-md border-b ${isDark ? 'border-gray-700' : 'border-slate-200'}`}>
-        <div className="px-4 py-4">
-          {/* Title and Add Button Row */}
-          <div className="flex items-center justify-between mb-4">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className={`sticky top-0 z-10 ${isDark ? 'bg-gray-900/95 border-gray-700' : 'bg-white/95 border-slate-200'} backdrop-blur-md border-b`}>
+        <div className="px-4 py-2">
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className={`text-2xl font-bold ${isDark ? "text-gray-100" : "text-slate-800"}`}>
+              Rewards Management
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Search and Filters Section */}
+      <div>
+        <div className="px-4 space-y-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-xl ${isDark ? 'bg-purple-900/50' : 'bg-purple-100'}`}>
                 <Award className={isDark ? "text-purple-400" : "text-purple-600"} size={24} />
               </div>
               <div>
-                <h2 className={`text-xl font-bold ${isDark ? "text-gray-100" : "text-slate-800"}`}>
+                <h3 className={`text-xl font-bold ${isDark ? "text-gray-100" : "text-slate-800"}`}>
                   Rewards
-                </h2>
+                </h3>
                 <p className={`text-xs ${isDark ? "text-gray-400" : "text-slate-600"}`}>
                   {filteredRewards.length} of {activeRewards.length} items
                 </p>
               </div>
             </div>
-            
             <button
-  onClick={() => {
-    setRewardForm({
-      name: "",
-      description: "",
-      cost: "",
-      stock: "",
-      category: "general", // default category
-      imagePreview: null,
-      imageFile: null,
-      imageUrl: null,
-    });
-    setRewardModal({ visible: true, reward: null, isEdit: false });
-  }}
-  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-lg font-medium flex items-center gap-2 text-sm"
-  type="button"
->
-  <Plus size={16} />
-  <span className="hidden sm:inline">Add Reward</span>
-</button>
-
+              onClick={() => {
+                setRewardForm({
+                  name: "",
+                  description: "",
+                  cost: "",
+                  stock: "",
+                  category: "general",
+                  imagePreview: null,
+                  imageFile: null,
+                  imageUrl: null,
+                });
+                setRewardModal({ visible: true, reward: null, isEdit: false });
+              }}
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-lg font-medium flex items-center gap-2 text-sm"
+              type="button"
+            >
+              <Plus size={16} />
+              <span className="hidden sm:inline">Add Reward</span>
+            </button>
           </div>
 
           {/* Search Bar */}
@@ -327,7 +219,6 @@ export default function RewardsTab({
           {showFilters && (
             <div className={`mb-3 p-4 rounded-xl border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-slate-50 border-slate-200'} space-y-3`}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Category filter */}
                 <div>
                   <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-slate-700'}`}>
                     Category
@@ -354,7 +245,6 @@ export default function RewardsTab({
                   </div>
                 </div>
 
-                {/* Stock filter */}
                 <div>
                   <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-slate-700'}`}>
                     Stock Status
@@ -380,7 +270,6 @@ export default function RewardsTab({
                 </div>
               </div>
 
-              {/* Clear filters */}
               {(searchTerm || categoryFilter !== "all" || stockFilter !== "all") && (
                 <div className="flex justify-end">
                   <button
@@ -408,7 +297,7 @@ export default function RewardsTab({
       </div>
 
       {/* Main Content */}
-      <div className="px-4 py-6" ref={scrollRef}>
+      <div className="px-4" ref={scrollRef}>
         {/* Stock Summary Cards */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
